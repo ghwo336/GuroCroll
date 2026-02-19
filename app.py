@@ -105,20 +105,16 @@ def preload_all():
 
 
 def daily_refresh():
-    """매일 새벽 5시에 데이터 갱신 (백그라운드 스레드)"""
+    """3일마다 데이터 갱신 (백그라운드 스레드)"""
+    INTERVAL = 3 * 24 * 3600  # 3일
     while True:
-        now = time.localtime()
-        # 다음 새벽 5시까지 남은 초 계산
-        seconds_until_5am = ((5 - now.tm_hour - 1) % 24) * 3600 + (60 - now.tm_min) * 60
-        if seconds_until_5am == 0:
-            seconds_until_5am = 86400
-        print(f"다음 갱신까지 {seconds_until_5am // 3600}시간 {(seconds_until_5am % 3600) // 60}분")
-        time.sleep(seconds_until_5am)
+        print(f"다음 갱신까지 3일")
+        time.sleep(INTERVAL)
 
-        print("=== 일일 데이터 갱신 시작 ===")
+        print("=== 데이터 갱신 시작 ===")
         try:
             preload_all()
-            print("=== 일일 데이터 갱신 완료 ===")
+            print("=== 데이터 갱신 완료 ===")
         except Exception as e:
             print(f"=== 갱신 실패: {e} ===")
 
