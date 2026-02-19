@@ -146,9 +146,24 @@ def schedules():
     return jsonify({"doctors": [], "rangeStart": "", "rangeEnd": ""})
 
 
-# 시작 시 프리로드 + 일일 갱신 스레드 시작
-preload_all()
-t = threading.Thread(target=daily_refresh, daemon=True)
+# 로딩 상태 플래그
+_loading = True
+
+
+def background_init():
+    """백그라운드에서 프리로드 후 일일 갱신 루프"""
+    global _loading
+    preload_all()
+    _loading = False
+    daily_refresh()
+
+
+@app.route("/api/status")
+def status():
+    return jsonify({"loading": _loading, "depts": len(_dept_list)})
+
+# 백그라운드 스레드로 프리로드 시작 (서버는 바로 응답 가능)
+t = threading.Thread(target=background_init, daemon=True)
 t.start()
 
 if __name__ == "__main__":

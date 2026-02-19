@@ -197,13 +197,30 @@
         currentMonth = now.getMonth() + 1;
         updateMonthDisplay();
 
-        fetch('/api/departments')
-            .then(r => r.json())
-            .then(data => {
-                departments = data;
-                document.getElementById('deptCount').textContent = `${data.length}개 진료과`;
-                renderDeptList();
-            });
+        function pollUntilReady() {
+            fetch('/api/status')
+                .then(r => r.json())
+                .then(st => {
+                    if (st.loading) {
+                        document.getElementById('content').innerHTML =
+                            '<div class="loading">서버 데이터 로딩 중... (최초 1회, 약 2~3분 소요)</div>';
+                        document.getElementById('deptCount').textContent = '데이터 로딩 중...';
+                        setTimeout(pollUntilReady, 3000);
+                    } else {
+                        fetch('/api/departments')
+                            .then(r => r.json())
+                            .then(data => {
+                                departments = data;
+                                document.getElementById('deptCount').textContent = `${data.length}개 진료과`;
+                                document.getElementById('content').innerHTML =
+                                    '<div class="placeholder"><p>좌측에서 진료과를 선택하세요</p><small>모든 과의 의사별 진료 스케줄을 확인할 수 있습니다</small></div>';
+                                renderDeptList();
+                            });
+                    }
+                })
+                .catch(() => setTimeout(pollUntilReady, 3000));
+        }
+        pollUntilReady();
 
         function renderDeptList() {
             const ul = document.getElementById('deptList');
