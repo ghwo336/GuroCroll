@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:guro.kumc.or.kr)",
+      "Bash(curl:*)"
+    ]
+  }
+}
