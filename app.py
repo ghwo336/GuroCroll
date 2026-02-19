@@ -162,12 +162,15 @@ def background_init():
 def status():
     return jsonify({"loading": _loading, "depts": len(_dept_list)})
 
-# 백그라운드 스레드로 프리로드 시작 (서버는 바로 응답 가능)
-t = threading.Thread(target=background_init, daemon=True)
-t.start()
+def start_background():
+    """백그라운드 스레드 시작 (워커 프로세스에서 호출)"""
+    t = threading.Thread(target=background_init, daemon=True)
+    t.start()
+
 
 if __name__ == "__main__":
     import os
-    port = int(os.environ.get("PORT", 5000))
+    start_background()
+    port = int(os.environ.get("PORT", 5001))
     print(f"\n서버 시작: http://localhost:{port}")
     app.run(debug=False, host="0.0.0.0", port=port)
