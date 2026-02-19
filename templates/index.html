@@ -68,7 +68,8 @@
             cursor: pointer;
             font-size: 14px;
         }
-        .month-nav button:hover { background: #f0f0f0; }
+        .month-nav button:hover:not(:disabled) { background: #f0f0f0; }
+        .month-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
         .month-nav .current-month { font-size: 18px; font-weight: 600; min-width: 120px; text-align: center; }
 
         /* 로딩 */
