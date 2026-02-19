@@ -146,6 +146,38 @@ def schedules():
     return jsonify({"doctors": [], "rangeStart": "", "rangeEnd": ""})
 
 
+@app.route("/api/by-date")
+def by_date():
+    date_str = request.args.get("date", "")
+    if not date_str:
+        return jsonify({"error": "date 파라미터 필요"}), 400
+
+    results = []
+    for dept_nm, cached in _schedule_cache.items():
+        doctors_on_date = []
+        for doc in cached["doctors"]:
+            for s in doc["schedule"]:
+                if s["mdcrYmd"] == date_str:
+                    am = s.get("amSttsDvsnCd") == "1"
+                    pm = s.get("pmSttsDvsnCd") == "1"
+                    if am or pm:
+                        doctors_on_date.append({
+                            "name": doc["name"],
+                            "title": doc["title"],
+                            "am": am,
+                            "pm": pm
+                        })
+                    break
+        if doctors_on_date:
+            results.append({
+                "deptNm": dept_nm,
+                "doctors": doctors_on_date
+            })
+
+    results.sort(key=lambda x: x["deptNm"])
+    return jsonify(results)
+
+
 # 로딩 상태 플래그
 _loading = True
 
