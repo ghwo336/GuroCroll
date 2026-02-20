@@ -545,7 +545,14 @@
                 return;
             }
 
-            content.innerHTML = doctors.map(doc => {
+            // 진료일정이 있는 교수를 위에 렌더링
+            const sorted = [...doctors].sort((a, b) => {
+                const aHas = filterScheduleForMonth(a.schedule).length > 0 ? 0 : 1;
+                const bHas = filterScheduleForMonth(b.schedule).length > 0 ? 0 : 1;
+                return aHas - bHas;
+            });
+
+            content.innerHTML = sorted.map(doc => {
                 const monthSchedule = filterScheduleForMonth(doc.schedule);
                 const calHtml = renderCalendar(monthSchedule);
                 return `
